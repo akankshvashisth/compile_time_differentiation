@@ -60,16 +60,43 @@ namespace aks
 		T t;
 	};
 
+	template<typename C, typename T, typename U>
+	struct if_else_condition
+	{
+		static const size_t dim = (C::dim > T::dim) ? (C::dim > U::dim ? C::dim : U::dim) : (T::dim > U::dim ? T::dim : U::dim);
+		if_else_condition(C c, T a, U b) : cond(c), t(a), u(b) {}
+
+		template<typename... Args>
+		auto operator()(Args... args) const {
+			static_assert(dim <= sizeof...(Args), "dimension insufficient");
+			return cond(args...) ? t(args...) : u(args...);
+		}
+
+		template<typename... Args>
+		auto operator()(Args... args) {
+			static_assert(dim <= sizeof...(Args), "dimension insufficient");
+			return cond(args...) ? t(args...) : u(args...);
+		}
+
+		C cond; T t; U u;
+	};
+
+	template<typename T>                         struct is_if_else_condition { enum { value = false }; };
+	template<typename C, typename T, typename U> struct is_if_else_condition<if_else_condition<C, T, U>> { enum { value = true }; };
+
+	template<typename C, typename T, typename U>
+	auto if_(C c, T t, U u) { return if_else_condition<C, T, U>(c, t, u); }
+
 	template<typename T>
 	auto make_constant(T t) { return constant<T>(t); }
 
 	template<typename T> struct is_constant_type { enum { value = false }; };
 	template<typename T> struct is_constant_type<constant<T>> { enum { value = true }; };
 
-	template<typename T> struct is_constant : std::integral_constant<bool, !is_variable<T>::value && !is_binary<T>::value && !is_unary<T>::value> {};
+	template<typename T> struct is_constant : std::integral_constant<bool, !is_variable<T>::value && !is_binary<T>::value && !is_unary<T>::value && !is_if_else_condition<T>::value > {};
 	template<typename T> struct is_not_constant : std::integral_constant<bool, !is_constant<T>::value> {};
 
-	template<typename T> struct is_independent : std::integral_constant<bool, !is_variable<T>::value && !is_binary<T>::value && !is_unary<T>::value && !is_constant_type<T>::value> {};
+	template<typename T> struct is_independent : std::integral_constant<bool, !is_variable<T>::value && !is_binary<T>::value && !is_unary<T>::value && !is_if_else_condition<T>::value && !is_constant_type<T>::value> {};
 	template<typename T> struct is_not_independent : std::integral_constant<bool, !is_independent<T>::value> {};
 
 #define DEFINE_BINARY_OP_INFIX(NAME, OP)                                                                                                                                                                             \
@@ -88,9 +115,24 @@ namespace aks
 	DEFINE_BINARY_OP_INFIX(mul, *);
 	DEFINE_BINARY_OP_INFIX(dvd, / );
 	DEFINE_BINARY_OP_INFIX(mod, %);
+	DEFINE_BINARY_OP_INFIX(cond_eq, ==);
+	DEFINE_BINARY_OP_INFIX(cond_neq, != );
+	DEFINE_BINARY_OP_INFIX(cond_ge, >= );
+	DEFINE_BINARY_OP_INFIX(cond_le, <= );
+	DEFINE_BINARY_OP_INFIX(cond_gt, > );
+	DEFINE_BINARY_OP_INFIX(cond_lt, < );
+	DEFINE_BINARY_OP_INFIX(cond_and, && );
+	DEFINE_BINARY_OP_INFIX(cond_or, ||);
 
 	struct negation { template<typename T> auto operator()(T t) { return -t; } };
 	template<typename T> typename std::enable_if<is_not_constant<T>::value, unary<T, negation >>::type operator - (T t) { return unary<T, negation >(t); }
+
+	struct cond_not { template<typename T> auto operator()(T t) { return !t; } };
+	template<typename T> typename std::enable_if<is_not_constant<T>::value, unary<T, cond_not >>::type not_(T t) { return unary<T, cond_not >(t); }
+
+	template<typename U>
+	struct as_type_ { template<typename T> U operator()(T t) { return (U)t; } };
+	template<typename U, typename T> typename std::enable_if<is_not_constant<T>::value, unary<T, as_type_<U> >>::type as_type(T t) { return unary<T, as_type_<U>>(t); }
 }
 
 #include <cmath>
@@ -312,6 +354,12 @@ namespace aks
 		enum { value = depends_on_dim<T, M>::value || depends_on_dim<U, M>::value };
 	};
 
+	template<typename T, typename U, typename C, size_t M>
+	struct depends_on_dim<if_else_condition<C, T, U>, M>
+	{
+		enum { value = /*depends_on_dim<C, M>::value ||*/ depends_on_dim<T, M>::value || depends_on_dim<U, M>::value }; //TODO: think about this...
+	};
+
 	template<typename T, typename Op, size_t M>
 	struct depends_on_dim<unary<T, Op>, M>
 	{
@@ -483,6 +531,15 @@ namespace aks
 
 	template<size_t N, size_t D>
 	auto differentiate(unary<variable<N>, absolute_value> u, variable<D> v) { return get_return<!(N == D)>::apply(constant<int>(0), (u.t / u)); }
+}
+
+namespace aks
+{
+	template<typename C, typename T, typename U> 
+	auto derivative(if_else_condition<C, T, U> b) { return if_(b.cond, derivative(b.t), derivative(b.u)); }
+	
+	template<typename C, typename T, typename U, size_t N> 
+	auto differentiate(if_else_condition<C, T, U> b, variable<N> v) { return if_(b.cond, differentiate(b.t, v), differentiate(b.u, v)); }
 }
 
 #endif // !__compile_time_differentiation_hpp__

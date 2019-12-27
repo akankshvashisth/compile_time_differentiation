@@ -40,6 +40,7 @@ std::string demangle(const char* name) {
 	std::string ret(name);
 	replace(ret, "aks::", "");
 	replace(ret, "struct ", "");
+	replace(ret, "if_else_condition", "if_");
 	replace(ret, "binary", "B");
 	replace(ret, "unary", "U");
 	replace(ret, "variable", "V");
@@ -379,6 +380,26 @@ std::string to_string(std::vector<std::vector<T>> const& v) {
 	return ss.str();
 };
 
+#define IF_(cond) aks::if_(cond
+#define _THEN_(x) ,x
+#define _ELSE(y) ,y)
+
+template<typename X>
+auto collatz_step(X n)
+{
+	return aks::if_(
+		aks::as_type<int>(n) % 2 == 0
+		, n / 2
+		, 3 * n + 1
+	);
+}
+
+template<typename X>
+auto collatz_step_0(X n)
+{
+	return IF_( aks::as_type<int>(n) % 2 == 0 )_THEN_( n / 2 )_ELSE( 3 * n + 1 );
+}
+
 int compile_time_differentiation_tests()
 {
 	aks::variable<0> x;
@@ -386,6 +407,44 @@ int compile_time_differentiation_tests()
 	aks::variable<2> z;
 	aks::variable<3> w;
 	auto const pi = 3.1415926535897932384626433;
+
+	std::cout << (y == 3)(1, 3) << std::endl;
+	std::cout << (y != x)(1, 3) << std::endl;
+	std::cout << (y >= x)(1, 3) << std::endl;
+	std::cout << (y >= x)(3, 3) << std::endl;
+	std::cout << (y > x)(3, 3) << std::endl;
+	std::cout << (not_(y > x))(3, 3) << std::endl;
+	std::cout << ((y > x) || (y >= x))(3, 3) << std::endl;
+	std::cout << ((y > x) && (y >= x))(3, 3) << std::endl;
+	std::cout << (not_(y > x) && (y >= x))(3, 3) << std::endl;
+	std::cout << (y*x)(4, 3) << std::endl;
+
+	std::cout << aks::if_(y > x, y*y, x+23)(3, 4) << std::endl;
+	std::cout << aks::if_(y > x, y*y, x+23)(3, 2) << std::endl;
+	std::cout << aks::if_(y > x, y*y, x+23)(3, 3) << std::endl;
+
+	std::cout << aks::derivative(aks::if_(x > 3.0, x*x*x, sin(x)))(4.0) << std::endl;
+	std::cout << aks::derivative(aks::if_(x > 3.0, x*x*x, sin(x)))(2.0) << std::endl;
+
+	std::cout << collatz_step(x)(collatz_step(x)(collatz_step(x)(collatz_step(x)(collatz_step(x)(collatz_step(x)(10)))))) << std::endl;
+
+	std::cout << (aks::if_(y > x, y, x) + z)(1, 2, 3) << std::endl;
+	std::cout << (aks::if_(y < x, y, x) + z)(1, 2, 3) << std::endl;
+
+	auto collatzN = collatz_step(collatz_step(collatz_step(collatz_step(collatz_step(collatz_step(x))))));
+	std::cout << collatzN(10) << std::endl;
+	std::cout << demangle(typeid(collatz_step(collatz_step(collatz_step(x)))).name()) << std::endl;
+
+	std::cout << aks::derivative(collatz_step(x))(8.0) << std::endl;
+	std::cout << aks::derivative(collatz_step(x))(9.0) << std::endl;
+	std::cout << aks::derivative(collatz_step(collatz_step(x)))(8.0) << std::endl;
+	std::cout << aks::derivative(collatz_step(collatz_step(x)))(9.0) << std::endl;
+	std::cout << aks::derivative(collatz_step(collatz_step(collatz_step(x))))(8.0) << std::endl;
+	std::cout << aks::derivative(collatz_step(collatz_step(collatz_step(x))))(9.0) << std::endl;
+	std::cout << aks::differentiate(collatz_step(collatz_step(collatz_step(x))), x)(9.0) << std::endl;
+	
+	std::cout << aks::derivative(IF_(x > 3.0)_THEN_(x * x * x)_ELSE(sin(x)))(4.0) << std::endl;
+		
 
 	/////////////////////////////
 	//auto ode = sin(x*y)/y;
