@@ -10,3 +10,5 @@
 *.ilk
 compile_time_differentation/.vs/compile_time_differentation/v16/.suo
 *.db
+*.ipdb
+*.iobj

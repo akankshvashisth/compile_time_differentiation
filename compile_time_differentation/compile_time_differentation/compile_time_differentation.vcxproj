@@ -157,7 +157,6 @@
   <ItemGroup>
     <ClInclude Include="compile_time_differentiation.hpp" />
     <ClInclude Include="compile_time_differentiation_tests.hpp" />
-    <ClInclude Include="defines.hpp" />
     <ClInclude Include="tuple_helper_utilities.hpp" />
     <ClInclude Include="variadic_arg_helpers.hpp" />
   </ItemGroup>

@@ -7,6 +7,7 @@
 #include <typeinfo>
 #include <algorithm>
 
+#include <tuple>
 #include <cstdlib>
 #include <memory>
 //#include <cxxabi.h>
@@ -72,8 +73,6 @@ constexpr size_t get_dim(T)
 {
 	return T::dim;
 }
-
-#include <tuple>
 
 template<typename... Ts>
 auto functions(Ts... ts)

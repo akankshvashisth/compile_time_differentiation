@@ -1,8 +1,6 @@
 #ifndef __variadic_arg_helpers_hpp__
 #define __variadic_arg_helpers_hpp__
 
-#include "defines.hpp"
-
 namespace aks
 {
 	namespace variadic_arg_helpers
@@ -11,13 +9,13 @@ namespace aks
 		struct reduce
 		{
 			template<typename T, typename... Ts>
-			AKS_FUNCTION_PREFIX_ATTR static T apply(T x, Ts... xs)
+			static T apply(T x, Ts... xs)
 			{
 				return binary_op::apply(x, reduce<binary_op>::apply(xs...));
 			}
 
 			template<typename T>
-			AKS_FUNCTION_PREFIX_ATTR static T apply(T x)
+			static T apply(T x)
 			{
 				return x;
 			}
@@ -26,7 +24,7 @@ namespace aks
 		struct product
 		{
 			template<typename T>
-			AKS_FUNCTION_PREFIX_ATTR static T apply(T x, T y)
+			static T apply(T x, T y)
 			{
 				return x * y;
 			}
@@ -35,7 +33,7 @@ namespace aks
 		struct add
 		{
 			template<typename T>
-			AKS_FUNCTION_PREFIX_ATTR static T apply(T x, T y)
+			static T apply(T x, T y)
 			{
 				return x + y;
 			}
