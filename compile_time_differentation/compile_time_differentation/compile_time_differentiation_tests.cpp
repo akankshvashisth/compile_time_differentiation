@@ -443,8 +443,9 @@ int compile_time_differentiation_tests()
 	std::cout << aks::differentiate(collatz_step(collatz_step(collatz_step(x))), x)(9.0) << std::endl;
 	
 	std::cout << aks::derivative(IF_(x > 3.0)_THEN_(x * x * x)_ELSE(sin(x)))(4.0) << std::endl;
-		
 
+	std::cout << (aks::differentiate(aks::if_(y > x, y, x) + z, z))(1, 2, 3) << std::endl;
+		
 	/////////////////////////////
 	//auto ode = sin(x*y)/y;
 	//
