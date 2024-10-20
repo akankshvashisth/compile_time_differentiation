@@ -1,0 +1,144 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "C/C++: clang debug build active file",
+            "type": "shell",
+            "command": "/usr/bin/clang++",
+            "args": [
+                "-g",
+                "-O0",
+                "-fno-inline",
+                "-fno-omit-frame-pointer",
+                "-D_GLIBCXX_DEBUG",
+                "-fstack-protector-all",
+                "-DDEBUG",
+                "-std=c++23",
+                "-fopenmp",
+                "-mavx2",
+                "-march=native",
+                "${file}",
+                "-o",
+                "${fileDirname}/bin/debug/clang/${fileBasenameNoExtension}",
+                "-ltbb",
+                "-lboost_thread",
+                "-lboost_chrono"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "C/C++: clang release build active file",
+            "type": "shell",
+            "command": "/usr/bin/clang++",
+            "args": [
+                "-O3",
+                "-DNDEBUG",
+                "-std=c++23",
+                "-fomit-frame-pointer",
+                "-ffunction-sections",
+                "-fdata-sections",
+                "-fno-exceptions",
+                "-fno-rtti",
+                "-flto",
+                "-fvisibility=hidden",
+                "-funroll-loops",
+                "-fstrict-aliasing",
+                "-fno-stack-protector",
+                "-fopenmp",
+                "-mavx2",
+                "-march=native",
+                "${file}",
+                "-o",
+                "${fileDirname}/bin/release/clang/${fileBasenameNoExtension}",
+                "-ltbb",
+                "-lboost_thread",
+                "-lboost_chrono"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "label": "C/C++: g++ debug build active file",
+            "type": "shell",
+            "command": "/usr/bin/g++",
+            "args": [
+                "-g",
+                "-O0",
+                "-fno-inline",
+                "-fno-omit-frame-pointer",
+                "-D_GLIBCXX_DEBUG",
+                "-fstack-protector-all",
+                "-DDEBUG",
+                "-std=c++23",
+                "-fopenmp",
+                "-mavx2",
+                "-march=native",
+                "${file}",
+                "-o",
+                "${fileDirname}/bin/debug/gcc/${fileBasenameNoExtension}",
+                "-ltbb",
+                "-lboost_thread",
+                "-lboost_chrono"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "label": "C/C++: g++ release build active file",
+            "type": "shell",
+            "command": "/usr/bin/g++",
+            "args": [
+                "-O3",
+                "-DNDEBUG",
+                "-std=c++23",
+                "-fomit-frame-pointer",
+                "-ffunction-sections",
+                "-fdata-sections",
+                "-fno-rtti",
+                "-flto",
+                "-fvisibility=hidden",
+                "-funroll-loops",
+                "-fstrict-aliasing",
+                "-fno-stack-protector",
+                "-fopenmp",
+                "-mavx2",
+                "-march=native",
+                "${file}",
+                "-o",
+                "${fileDirname}/bin/release/gcc/${fileBasenameNoExtension}",
+                "-ltbb",
+                "-lboost_thread",
+                "-lboost_chrono"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build"
+            }
+        }
+    ]
+}

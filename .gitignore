@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+#visual studio
+*.vs
+*.pdb
+/compile_time_differentiation/compile_.a92e5cb2/x64/Debug
+/compile_time_differentiation/bin/release/gcc/compile_time_differentiation
+/compile_time_differentiation/bin/release/clang/compile_time_differentiation
+/compile_time_differentiation/bin/debug/gcc/compile_time_differentiation
+/compile_time_differentiation/bin/debug/clang/compile_time_differentiation
