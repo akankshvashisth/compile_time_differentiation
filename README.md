@@ -1,11 +1,14 @@
-# compile_time_differentiation
-Proof of concept using C++20 metaprogramming to do compile time differentiation of functions
+# Compile time differentiation of functions using C++20 
 
-For now only support simple operations like ( -,+,-,*,/,<,> )
+Proof of concept, for now only support simple operations like ( -,+,-,*,/,<,> )
 
 ## Setup
 
+> Header only, include `compiler_time_differentiation.hpp`
+
 ```
+#include "compile_time_differentiation.hpp"
+
 using X = aks::compile_time_diff::var<0>;
 using Y = aks::compile_time_diff::var<1>;
 using Z = aks::compile_time_diff::var<2>;
